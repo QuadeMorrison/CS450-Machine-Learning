@@ -1,4 +1,3 @@
-from classifier import Classifier
 import numpy as np
 
 class Dataset(object):
@@ -15,7 +14,8 @@ class Dataset(object):
 
             if isinstance(row[0], np.bytes_):
                 features = np.unique(row)
-                row = [np.where(features == item)[0][0] for item in row]
+                row = np.asarray([np.where(features == item)[0][0] for item in row])
+                row = (row - row.mean()) / row.std() if i != len(csv[0]) - 1 else row
 
             rows.append(row)
             
