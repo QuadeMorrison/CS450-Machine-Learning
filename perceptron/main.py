@@ -1,31 +1,25 @@
 import pandas as pd
-import numpy as np
-import random
+#import numpy as np
+from classifier import Classifier
 from sklearn import preprocessing
-
-#constant
-BIAS_INPUT = [-1]
 
 def perceptron():
     inputs, classes = readCsv("iris.data")
-    input = list(inputs.iloc[[0]])
-    nodes = createNodeLayer(2, len(input) + 1)
-    doesFireArray = doesFire(input, nodes)
-    print(doesFireArray)
+    classifier = Classifier()
+    classifier.fit(inputs, classes)
+    predicted = classifier.predict(inputs)
+    print(calcAccuracy(predicted, classes))
 
-def createWeights(featureNum):
-    return [random.uniform(-1, 1) for i in range(featureNum)]
+def calcAccuracy(predicted, actual):
+    correctNum = sum([1 if p == a else 0 for (p, a) in zip(predicted, actual)])
+    return correctNum / len(actual) * 100
 
-def createNodeLayer(nodeNum, featureNum):
-    return [createWeights(featureNum) for i in range(nodeNum)]
-
-def calc_threshold(features, weights):
-    return sum([f * w for (f, w) in zip(features + BIAS_INPUT, weights)])
-
-def doesFire(features, nodes):
-    return [1 if calc_threshold(features, weights) >= 0 else 0 for weights in nodes]
 
 def readCsv(fileName):
+    #csv = np.genfromtxt(fileName, delimiter=",", dtype=None)
+    #inputs = [list(data)[:-1] for data in csv]
+    #classes = [data[-1] for data in csv]
+    #return inputs, classes
     df = pd.read_csv(fileName, header=None)
     class_index = len(list(df)) - 1
     inputs = df.drop(class_index, axis=1)
@@ -33,5 +27,4 @@ def readCsv(fileName):
     inputs_norm = (inputs - inputs.mean()) / (inputs.max() - inputs.min())
     return inputs_norm, classes
     
-
 perceptron()
